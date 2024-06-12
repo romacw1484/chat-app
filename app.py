@@ -62,7 +62,7 @@ def logout():
 @app.route('/chat')
 @login_required
 def chat():
-    return render_template('chat.html')
+    return render_template('index.html')
 
 @socketio.on('message')
 def handleMessage(msg):

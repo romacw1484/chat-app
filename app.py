@@ -1,5 +1,5 @@
-# app.py
-from flask import Flask, render_template, redirect, url_for, request
+# app.py 
+from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -23,7 +23,10 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if current_user.is_authenticated:
+        return redirect(url_for('chat'))
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -33,7 +36,9 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
-            return redirect(url_for('index'))
+            return redirect(url_for('chat'))
+        else:
+            flash('Login failed. Check your username and/or password.')
     return render_template('login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -52,7 +57,7 @@ def signup():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.route('/chat')
 @login_required

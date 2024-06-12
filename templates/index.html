@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <span>Welcome,</span>
+            <button id="exit">Exit Chat</button>
+        </div>
+        <div id="chat" class="chat-messages"></div>
+        <div class="chat-input">
+            <input id="message" type="text" placeholder="Enter your message...">
+            <button id="send">Send</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io.connect('http://127.0.0.1:5000');
+            const chat = document.getElementById('chat');
+            const messageInput = document.getElementById('message');
+            const sendButton = document.getElementById('send');
+            const exitButton = document.getElementById('exit');
+
+            socket.on('message', (msg) => {
+                const msgElement = document.createElement('div');
+                msgElement.classList.add('chat-message');
+                const username = 'User';  // Replace with actual username logic if needed
+                const message = msg;
+                const timestamp = new Date().toLocaleTimeString();
+
+                msgElement.innerHTML = `
+                    <span class="username">${username}</span>
+                    <span class="timestamp">${timestamp}</span>
+                    <span class="message">${message}</span>
+                `;
+                chat.appendChild(msgElement);
+                chat.scrollTop = chat.scrollHeight;
+            });
+
+            sendButton.addEventListener('click', () => {
+                const msg = messageInput.value;
+                if (msg.trim()) {
+                    socket.send(msg);
+                    messageInput.value = '';
+                }
+            });
+
+            exitButton.addEventListener('click', () => {
+                const msg = 'User has left the chat session.';  // Replace with actual exit message logic if needed
+                socket.send(msg);
+                window.location.reload();
+            });
+        });
+    </script>
+</body>
+</html>

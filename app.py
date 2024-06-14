@@ -1,4 +1,4 @@
-# app.py   
+# app.py    
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
@@ -67,5 +67,6 @@ def chat():
 
 if __name__ == '__main__':
     with app.app_context():
+        db.init_app(app)  # Initialize SQLAlchemy with app
         db.create_all()
     app.run(debug=True)

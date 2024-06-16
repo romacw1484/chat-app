@@ -1,13 +1,15 @@
-# app.py    
+# app.py    1fe162a579d7de0e7d65a09dfec35e0f
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_socketio import SocketIO, send
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '1fe162a579d7de0e7d65a09dfec35e0f'
+app.config['SECRET_KEY'] = '1fe162a579d7de07d65a90dfee3c5e0f'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 db = SQLAlchemy(app)
+socketio = SocketIO(app)
 
 login_manager = LoginManager()
 login_manager.login_view = 'login'
@@ -65,8 +67,11 @@ def logout():
 def chat():
     return render_template('index.html')  # Ensure this points to index.html
 
+@socketio.on('message')
+def handle_message(msg):
+    send(msg, broadcast=True)
+
 if __name__ == '__main__':
     with app.app_context():
-        db.init_app(app)  # Initialize SQLAlchemy with app
-        db.create_all()
-    app.run(debug=True)
+        db.create_all()  # Initialize SQLAlchemy with app
+    socketio.run(app, debug=True)

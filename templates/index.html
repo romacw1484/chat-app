@@ -10,7 +10,7 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <span>Welcome,</span>
+            <span>Welcome, {{ current_user.username }}</span>
             <button id="exit">Exit Chat</button>
         </div>
         <div id="chat" class="chat-messages"></div>
@@ -27,11 +27,11 @@
             const sendButton = document.getElementById('send');
             const exitButton = document.getElementById('exit');
 
-            socket.on('message', (msg) => {
+            socket.on('message', (data) => {
                 const msgElement = document.createElement('div');
                 msgElement.classList.add('chat-message');
-                const username = 'User';  // Replace with actual username logic if needed
-                const message = msg;
+                const username = data.user;
+                const message = data.msg;
                 const timestamp = new Date().toLocaleTimeString();
 
                 msgElement.innerHTML = `

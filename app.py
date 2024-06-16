@@ -51,9 +51,13 @@ def signup():
         password = request.form.get('password')
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         new_user = User(username=username, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('login'))
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Account created successfully. Please log in.')
+            return redirect(url_for('login'))
+        except:
+            flash('Username already exists.')
     return render_template('signup.html')
 
 @app.route('/logout')
@@ -69,7 +73,8 @@ def chat():
 
 @socketio.on('message')
 def handle_message(msg):
-    send(msg, broadcast=True)
+    user = current_user.username if current_user.is_authenticated else 'Anonymous'
+    send({'msg': msg, 'user': user}, broadcast=True)
 
 if __name__ == '__main__':
     with app.app_context():
